@@ -7,6 +7,10 @@ class Game {
     this.players = players;
   }
 
+  currentPlayerId() {
+    return this.players[this.whoseTurn].id;
+  }
+
   nextTurn() {
     console.log("next turn");
     this.whoseTurn = (this.whoseTurn + 1) % this.players.length;
