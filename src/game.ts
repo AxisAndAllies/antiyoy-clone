@@ -1,3 +1,4 @@
+import { Stat, UnitType } from "./stats";
 class Game {
   players: Player[];
   whoseTurn: number = 0;
@@ -14,17 +15,22 @@ class Game {
 
 class Player {
   money: number;
+  id: string;
+  color: string;
 
-  constructor() {
+  constructor(color: string) {
     this.money = 0;
+    this.color = color;
+    this.id = Math.floor(Math.random() * 1000).toString();
   }
 
-  greet() {
-    return "Hello, " + this.greeting;
+  buy(unitType: UnitType) {
+    if (this.money <= Stat[unitType].cost) {
+    }
   }
 }
 class Unit {}
 
 class Building {}
 
-export { Game };
+export { Game, Player, Unit, Building };
