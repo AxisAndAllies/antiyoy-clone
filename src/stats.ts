@@ -11,15 +11,23 @@ export enum UnitType {
 // Any unit can move up to 4 hexes in a turn,
 // provided that all but the last hex are their own Province.
 
-export const Stat: Record<
-  string,
-  {
-    cost: number; // base cost
-    strength: number;
-    protection: number;
-    income?: number;
-  }
-> = {
+export const canMove = (unitType: UnitType) => {
+  return [
+    UnitType.PEASANT,
+    UnitType.SPEARMAN,
+    UnitType.BARON,
+    UnitType.KNIGHT,
+  ].includes(unitType);
+};
+
+export type Stat = {
+  cost: number; // base cost
+  strength: number;
+  protection: number;
+  income: number;
+};
+
+export const Stats: Record<string, Stat> = {
   [UnitType.PEASANT]: {
     cost: 10,
     income: -2,

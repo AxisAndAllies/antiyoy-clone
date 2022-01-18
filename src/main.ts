@@ -1,5 +1,5 @@
 import "./style.css";
-import { Stat } from "./stats";
+import { Stat, Stats } from "./stats";
 import * as Honeycomb from "honeycomb-grid";
 import { fabric } from "fabric";
 import { Game, Player } from "./game";
@@ -68,7 +68,7 @@ function getColor(playerId: string): string {
 
 function createUI() {
   const store = document.querySelector<HTMLDivElement>("#store")!;
-  Object.entries(Stat).forEach(([name, stat]) => {
+  Object.entries(Stats).forEach(([name, stat]) => {
     let btn = document.createElement("button");
     btn.innerHTML = name + "(" + JSON.stringify(stat) + ")";
     store.appendChild(btn);
@@ -99,12 +99,12 @@ function setupCanvas() {
       // from hex is selected
       if (takeOver(fromHex, res)) {
         res.ownerId = game.currentPlayerId();
-        res?.polygon.set("fill", getColor(res.ownerId));
+        res.polygon!.set("fill", getColor(res.ownerId));
       }
       console.log(fromHex);
       console.log(res);
       // reset
-      fromHex.polygon.set("fill", getColor(res.ownerId));
+      fromHex.polygon!.set("fill", getColor(res.ownerId));
       fromHex = null;
     }
   });
@@ -116,12 +116,5 @@ function setupCanvas() {
   });
 }
 function takeOver(from: MyHex, to: MyHex) {
-  // check within range
-  // check diff owner
-  if (to.ownerId == from.ownerId) {
-    return true;
-  }
-  // check strength
-  // resolve
-  return true;
+  return game.move();
 }

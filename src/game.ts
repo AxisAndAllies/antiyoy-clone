@@ -1,4 +1,4 @@
-import { Stat, UnitType } from "./stats";
+import { canMove, Stat, Stats, UnitType } from "./stats";
 import { MyHex } from "./types";
 
 class Game {
@@ -24,6 +24,9 @@ class Game {
   move(unit: Unit, toHex: MyHex) {
     //  // check within range
     const dist = unit.hex.distance(toHex.cube());
+    if (!canMove(unit.type)) {
+      return false;
+    }
     if (dist > 4) {
       false;
       // TODO: need to check more thoroughly...
@@ -63,7 +66,7 @@ class Player {
   }
 
   buy(unitType: UnitType, hex: MyHex): Unit | null {
-    if (this.money <= Stat[unitType].cost) {
+    if (this.money <= Stats[unitType].cost) {
       return new Unit(unitType, this, hex);
     }
     return null;
@@ -71,18 +74,13 @@ class Player {
 }
 class Unit {
   type: UnitType;
-  stat: {
-    cost: number;
-    upkeep: number;
-    strength: number;
-    protection: number;
-  };
+  stat: Stat;
   hex: MyHex;
   owner: Player;
 
   constructor(type: UnitType, owner: Player, hex: MyHex) {
     this.type = type;
-    this.stat = Stat[type];
+    this.stat = Stats[type];
     this.hex = hex;
     this.owner = owner;
   }
