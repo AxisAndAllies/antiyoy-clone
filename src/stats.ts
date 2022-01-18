@@ -4,6 +4,8 @@ export enum UnitType {
   BARON,
   KNIGHT,
 }
+// Any unit can move up to 4 hexes in a turn,
+// provided that all but the last hex are their own Province.
 
 export const Stat = {
   [UnitType.PEASANT]: {

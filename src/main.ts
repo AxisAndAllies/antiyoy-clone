@@ -3,8 +3,9 @@ import { Stat } from "./stats";
 import * as Honeycomb from "honeycomb-grid";
 import { fabric } from "fabric";
 import { Game, Player } from "./game";
+import { MyHex } from "./types";
 
-let fromHex = null;
+let fromHex: MyHex | null = null;
 let players = [new Player("#ab0"), new Player("#30b")];
 let game = new Game(players);
 const canvas = new fabric.Canvas("c");
@@ -13,7 +14,7 @@ const CustomHex = Honeycomb.extendHex({
   size: 30,
   orientation: "flat",
   // custom
-  owner: "",
+  ownerId: "",
   polygon: null as fabric.Polygon | null,
 });
 
@@ -27,18 +28,18 @@ const grid = Grid.rectangle({ width: 30, height: 30 });
 grid.forEach((hex) => {
   const rand = Math.random();
   if (rand < 0.02) {
-    hex.owner = players[0].id;
+    hex.ownerId = players[0].id;
   } else if (rand < 0.04) {
-    hex.owner = players[1].id;
+    hex.ownerId = players[1].id;
   } else {
-    hex.owner = "";
+    hex.ownerId = "";
   }
   const { x, y } = hex.toPoint();
 
   let polygon = new fabric.Polygon(corners.map(({ x, y }) => ({ x, y })));
   polygon.left = x;
   polygon.top = y;
-  polygon.set("fill", hex.owner ? getColor(hex.owner) : "#ccc");
+  polygon.set("fill", hex.ownerId ? getColor(hex.ownerId) : "#ccc");
   polygon.set("stroke", "white");
 
   polygon.selectable = false;
@@ -87,24 +88,23 @@ function setupCanvas() {
   canvas.selection = false; // disable group selection
   canvas.on("mouse:down", function (options) {
     let coords = Grid.pointToHex([options.pointer?.x, options.pointer.y]);
-    let res = grid.get(coords);
+    let res = grid.get(coords) as MyHex;
 
     if (!fromHex) {
       // from hex not selected
-      if (res.owner == game.currentPlayerId()) {
-        options.target?.set("fill", "#aaa");
+      if (res.ownerId == game.currentPlayerId()) {
         fromHex = res;
       }
     } else {
       // from hex is selected
       if (takeOver(fromHex, res)) {
-        res.owner = game.currentPlayerId();
-        res?.polygon.set("fill", getColor(res.owner));
+        res.ownerId = game.currentPlayerId();
+        res?.polygon.set("fill", getColor(res.ownerId));
       }
       console.log(fromHex);
       console.log(res);
       // reset
-      fromHex.polygon.set("fill", getColor(res.owner));
+      fromHex.polygon.set("fill", getColor(res.ownerId));
       fromHex = null;
     }
   });
@@ -115,10 +115,10 @@ function setupCanvas() {
     e.target?.set("stroke", "white");
   });
 }
-function takeOver(from, to) {
+function takeOver(from: MyHex, to: MyHex) {
   // check within range
   // check diff owner
-  if (to.owner == from.owner) {
+  if (to.ownerId == from.ownerId) {
     return true;
   }
   // check strength
