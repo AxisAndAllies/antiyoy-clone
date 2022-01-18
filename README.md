@@ -7,4 +7,4 @@
 - TS + Vite
 - libs
   - [honeycomb](https://github.com/flauwekeul/honeycomb)
-  - [svg.js](https://github.com/svgdotjs/svg.js)
+  - [fabric.js](https://github.com/fabricjs/fabric.js)
