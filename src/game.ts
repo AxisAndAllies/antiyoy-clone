@@ -33,11 +33,16 @@ class Game {
       return true;
     }
     // check strength
-    // resolve
-    return true;
+    if (unit.stat.strength > this.getProtection(toHex)) {
+      return true;
+    }
+    return false;
   }
-  getStrength(hex: MyHex) {
-    return this.units.filter((u) => u.owner.id == hex.owner);
+  getProtection(hex: MyHex) {
+    const neighbors = this.units.filter(
+      (u) => u.owner.id == hex.ownerId && u.hex.distance(hex.cube())
+    );
+    return Math.max(...neighbors.map((n) => n.stat.protection));
   }
 
   nextTurn() {
