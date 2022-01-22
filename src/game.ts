@@ -21,7 +21,14 @@ class Game {
       this.units.push(res);
     }
   }
-  move(unit: Unit, toHex: MyHex) {
+  move(fromHex: MyHex, toHex: MyHex) {
+    let unit = this.units.find((u) => u.hex == fromHex);
+    if (!unit) {
+      return false;
+    }
+    return this._move(unit, toHex);
+  }
+  _move(unit: Unit, toHex: MyHex) {
     //  // check within range
     const dist = unit.hex.distance(toHex.cube());
     if (!canMove(unit.type)) {

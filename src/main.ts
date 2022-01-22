@@ -62,8 +62,8 @@ const mapGen = () => {
   // generate map
 };
 
-function getColor(playerId: string): string {
-  return game.players.filter((p) => p.id == playerId)[0].color;
+function getColor(playerId: string): string | undefined {
+  return game.players.find((p) => p.id == playerId)?.color;
 }
 
 function createUI() {
@@ -99,12 +99,20 @@ function setupCanvas() {
       // from hex is selected
       if (takeOver(fromHex, res)) {
         res.ownerId = game.currentPlayerId();
-        res.polygon!.set("fill", getColor(res.ownerId));
+        const color = getColor(res.ownerId);
+        if (color) {
+          res.polygon!.set("fill", color);
+        }
+      } else {
+        alert("Move not successful.");
       }
       console.log(fromHex);
       console.log(res);
       // reset
-      fromHex.polygon!.set("fill", getColor(res.ownerId));
+      const color = getColor(res.ownerId);
+      if (color) {
+        res.polygon!.set("fill", color);
+      }
       fromHex = null;
     }
   });
@@ -115,6 +123,7 @@ function setupCanvas() {
     e.target?.set("stroke", "white");
   });
 }
-function takeOver(from: MyHex, to: MyHex) {
-  return game.move();
+function takeOver(from: MyHex, to: MyHex): boolean {
+  const successful = game.move(from, to);
+  return successful;
 }
