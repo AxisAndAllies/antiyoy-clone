@@ -14,9 +14,13 @@ class Game {
   currentPlayerId() {
     return this.players[this.whoseTurn].id;
   }
+  getPlayerById(id: string) {
+    return this.players.find((p) => p.id == id);
+  }
   buy(unitType: UnitType, hex: MyHex) {
-    let curPlayer = this.players[this.whoseTurn];
-    let res = curPlayer.buy(unitType, hex);
+    // let curPlayer = this.players[this.whoseTurn];
+    let curPlayer = this.getPlayerById(hex.ownerId);
+    let res = curPlayer?.buy(unitType, hex);
     if (res) {
       this.units.push(res);
     }
@@ -39,11 +43,16 @@ class Game {
       // TODO: need to check more thoroughly...
     }
     if (toHex.ownerId == unit.owner.id) {
-      // check diff owner
+      // moving to friendly hex
       return true;
     }
     // check strength
     if (unit.stat.strength > this.getProtection(toHex)) {
+      // moving to enemy hex
+      // removing all units on that hex
+      this.units = this.units.filter((u) => u.hex != toHex);
+      // moving new unit to that hex
+      unit.hex = toHex;
       return true;
     }
     return false;

@@ -1,5 +1,5 @@
 import "./style.css";
-import { Stat, Stats } from "./stats";
+import { Stat, Stats, UnitType } from "./stats";
 import * as Honeycomb from "honeycomb-grid";
 import { fabric } from "fabric";
 import { Game, Player } from "./game";
@@ -29,6 +29,7 @@ grid.forEach((hex) => {
   const rand = Math.random();
   if (rand < 0.02) {
     hex.ownerId = players[0].id;
+    game.buy(UnitType.PEASANT, hex);
   } else if (rand < 0.04) {
     hex.ownerId = players[1].id;
   } else {
