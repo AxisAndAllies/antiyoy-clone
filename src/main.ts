@@ -1,12 +1,12 @@
 import "./style.css";
-import { Stat, Stats, UnitType } from "./stats";
+import { canMove, Stat, Stats, UnitType } from "./stats";
 import * as Honeycomb from "honeycomb-grid";
 import { fabric } from "fabric";
 import { Game, Player, Unit } from "./game";
 import { MyHex } from "./types";
 
 let fromHex: MyHex | null = null;
-let players = [new Player("#ab0"), new Player("#30b")];
+let players = [new Player("#ab0"), new Player("#da4")];
 const canvas = new fabric.Canvas("c");
 
 const CustomHex = Honeycomb.extendHex({
@@ -32,6 +32,7 @@ grid.forEach((hex) => {
     game.buy(UnitType.PEASANT, hex);
   } else if (rand < 0.04) {
     hex.ownerId = players[1].id;
+    game.buy(UnitType.PEASANT, hex);
   } else {
     hex.ownerId = "";
   }
@@ -55,7 +56,7 @@ setInterval(() => {
   renderGame();
   canvas.requestRenderAll();
   document.getElementById("whoseturn").innerHTML = game.whoseTurn;
-}, 50);
+}, 100);
 
 createUI();
 setupCanvas();
@@ -132,13 +133,18 @@ function takeOver(from: MyHex, to: MyHex): boolean {
 function renderGame() {
   grid.forEach((hex) => {
     hex.polygon.set("stroke", "white");
-    hex.polygon.set("strokeWidth", 2);
+    hex.polygon.set("strokeWidth", 1);
   });
   game.units.forEach((u) => {
     renderUnit(u);
   });
 }
 function renderUnit(unit: Unit) {
-  unit.hex.polygon!.set("stroke", unit.stat.strength == 1 ? "blue" : "white");
+  let color = "black";
+  if (canMove(unit.type)) {
+    color = "blue";
+  }
+  unit.hex.polygon!.set("stroke", unit.stat.strength > 0 ? color : "white");
+  unit.hex.polygon!.set("strokeWidth", unit.stat.strength * 1.5 - 0.5);
   //
 }

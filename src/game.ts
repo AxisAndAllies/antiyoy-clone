@@ -54,6 +54,7 @@ class Game {
       this._forceMoveUnit(unit, toHex);
       return true;
     }
+    console.log(this.getProtection(toHex));
     // check strength
     if (unit.stat.strength > this.getProtection(toHex)) {
       // moving to enemy hex
@@ -73,7 +74,7 @@ class Game {
   }
   getProtection(hex: MyHex) {
     const neighbors = this.units.filter(
-      (u) => u.owner.id == hex.ownerId && u.hex.distance(hex.cube())
+      (u) => u.owner.id == hex.ownerId && u.hex.distance(hex.cube()) == 1
     );
     return Math.max(...neighbors.map((n) => n.stat.protection));
   }
