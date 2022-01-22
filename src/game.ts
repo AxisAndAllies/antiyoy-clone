@@ -1,3 +1,4 @@
+import { Grid } from "honeycomb-grid";
 import { canMove, Stat, Stats, UnitType } from "./stats";
 import { MyHex } from "./types";
 
@@ -5,10 +6,12 @@ class Game {
   players: Player[];
   whoseTurn: number = 0;
   units: Unit[];
+  grid: Grid<MyHex>;
 
-  constructor(players: Player[]) {
+  constructor(players: Player[], hexgrid: Grid<MyHex>) {
     this.players = players;
     this.units = [];
+    this.grid = hexgrid;
   }
 
   currentPlayerId() {
@@ -39,23 +42,34 @@ class Game {
       return false;
     }
     if (dist > 4) {
-      false;
-      // TODO: need to check more thoroughly...
+      return false;
     }
+    if (this.getFriendlyNeighbors(toHex, unit.owner).length == 0) {
+      return false;
+    }
+    // TODO: need to check more thoroughly...
+
     if (toHex.ownerId == unit.owner.id) {
       // moving to friendly hex
+      this._forceMoveUnit(unit, toHex);
       return true;
     }
     // check strength
     if (unit.stat.strength > this.getProtection(toHex)) {
       // moving to enemy hex
-      // removing all units on that hex
-      this.units = this.units.filter((u) => u.hex != toHex);
-      // moving new unit to that hex
-      unit.hex = toHex;
+      this._forceMoveUnit(unit, toHex);
       return true;
     }
     return false;
+  }
+  _forceMoveUnit(unit: Unit, toHex: MyHex) {
+    // removing all units on that hex
+    this.units = this.units.filter((u) => u.hex != toHex);
+    // moving new unit to that hex
+    unit.hex = toHex;
+  }
+  getFriendlyNeighbors(hex: MyHex, owner: Player) {
+    return this.grid.neighborsOf(hex).filter((hex) => hex.ownerId == owner.id);
   }
   getProtection(hex: MyHex) {
     const neighbors = this.units.filter(

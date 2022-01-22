@@ -2,12 +2,11 @@ import "./style.css";
 import { Stat, Stats, UnitType } from "./stats";
 import * as Honeycomb from "honeycomb-grid";
 import { fabric } from "fabric";
-import { Game, Player } from "./game";
+import { Game, Player, Unit } from "./game";
 import { MyHex } from "./types";
 
 let fromHex: MyHex | null = null;
 let players = [new Player("#ab0"), new Player("#30b")];
-let game = new Game(players);
 const canvas = new fabric.Canvas("c");
 
 const CustomHex = Honeycomb.extendHex({
@@ -22,8 +21,9 @@ const Grid = Honeycomb.defineGrid(CustomHex);
 // get the corners of a hex (they're the same for all hexes created with the same Hex factory)
 const corners = CustomHex().corners();
 
-// render 10,000 hexes
 const grid = Grid.rectangle({ width: 30, height: 30 });
+
+let game = new Game(players, grid);
 
 grid.forEach((hex) => {
   const rand = Math.random();
@@ -52,6 +52,7 @@ grid.forEach((hex) => {
 console.log(grid);
 
 setInterval(() => {
+  renderGame();
   canvas.requestRenderAll();
   document.getElementById("whoseturn").innerHTML = game.whoseTurn;
 }, 50);
@@ -127,4 +128,17 @@ function setupCanvas() {
 function takeOver(from: MyHex, to: MyHex): boolean {
   const successful = game.move(from, to);
   return successful;
+}
+function renderGame() {
+  grid.forEach((hex) => {
+    hex.polygon.set("stroke", "white");
+    hex.polygon.set("strokeWidth", 2);
+  });
+  game.units.forEach((u) => {
+    renderUnit(u);
+  });
+}
+function renderUnit(unit: Unit) {
+  unit.hex.polygon!.set("stroke", unit.stat.strength == 1 ? "blue" : "white");
+  //
 }
