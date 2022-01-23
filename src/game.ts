@@ -108,17 +108,29 @@ class Unit {
   stat: Stat;
   hex: MyHex;
   owner: Player;
+  id: number;
 
   constructor(type: UnitType, owner: Player, hex: MyHex) {
     this.type = type;
     this.stat = Stats[type];
     this.hex = hex;
     this.owner = owner;
+    this.id = Math.floor(Math.random() * 1000000);
   }
   moveTo(toHex: MyHex) {
     this.hex = toHex;
   }
 }
 class Tree {}
+class Renderer {
+  pairs: Record<string | number, fabric.Group> = {};
+  constructor() {}
+  addPair(unit: Unit, graphic: fabric.Group) {
+    this.pairs[unit.id] = graphic;
+  }
+  getGraphic(unit: Unit) {
+    return this.pairs[unit.id];
+  }
+}
 
-export { Game, Player, Tree, Unit };
+export { Game, Player, Tree, Unit, Renderer };

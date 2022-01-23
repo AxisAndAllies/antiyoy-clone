@@ -2,7 +2,7 @@ import "./style.css";
 import { canMove, Stat, Stats, UnitType } from "./stats";
 import * as Honeycomb from "honeycomb-grid";
 import { fabric } from "fabric";
-import { Game, Player, Unit } from "./game";
+import { Game, Player, Renderer, Unit } from "./game";
 import { MyHex } from "./types";
 
 let fromHex: MyHex | null = null;
@@ -24,6 +24,7 @@ const corners = CustomHex().corners();
 const grid = Grid.rectangle({ width: 30, height: 30 });
 
 let game = new Game(players, grid);
+let renderer = new Renderer();
 
 grid.forEach((hex) => {
   const rand = Math.random();
@@ -32,7 +33,7 @@ grid.forEach((hex) => {
     game.buy(UnitType.PEASANT, hex);
   } else if (rand < 0.04) {
     hex.ownerId = players[1].id;
-    game.buy(UnitType.PEASANT, hex);
+    game.buy(UnitType.CASTLE, hex);
   } else {
     hex.ownerId = "";
   }
@@ -140,11 +141,42 @@ function renderGame() {
   });
 }
 function renderUnit(unit: Unit) {
-  let color = "black";
-  if (canMove(unit.type)) {
-    color = "blue";
+  const isBuilding = !canMove(unit.type);
+  const color = unit.owner.color;
+  const strength = unit.stat.strength;
+  const scale = strength * 4 + 4;
+  let group = renderer.getGraphic(unit);
+  if (!group) {
+    let obj = null;
+    obj = new fabric.Circle({
+      radius: scale,
+      fill: "#555",
+      originX: "center",
+      originY: "center",
+    });
+    if (isBuilding) {
+      obj = new fabric.Rect({
+        fill: "black",
+        originX: "center",
+        originY: "center",
+        width: scale * 4,
+        height: scale * 4,
+      });
+    }
+    group = new fabric.Group([obj], {
+      left: unit.hex.polygon?.left,
+      top: unit.hex.polygon?.top,
+    });
+    canvas.add(group);
+    renderer.addPair(unit, group);
   }
-  unit.hex.polygon!.set("stroke", unit.stat.strength > 0 ? color : "white");
-  unit.hex.polygon!.set("strokeWidth", unit.stat.strength * 1.5 - 0.5);
+  group.left = unit.hex.polygon?.left + unit.hex.polygon?.width / 2;
+  group.top = unit.hex.polygon?.top + +unit.hex.polygon?.height / 2;
+  // let color = "black";
+  // if () {
+  //   color = "blue";
+  // }
+  // unit.hex.polygon!.set("stroke", unit.stat.strength > 0 ? color : "white");
+  // unit.hex.polygon!.set("strokeWidth", unit.stat.strength * 1.5 - 0.5);
   //
 }
